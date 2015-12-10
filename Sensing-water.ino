@@ -293,7 +293,7 @@ void scanSensors()
 			}
 			else 
 			{
-				rValue = 2047;
+				rValue = 2047; //BE CAREFUL.......!!
 			}
 
 			//Serial.print("calculated R y");
@@ -307,7 +307,7 @@ void scanSensors()
 			currentDepth -= sensorInterval;
 
 			int irValue = (int)rValue;
-			if(irValue >= 1000 && irValue <=2047) //ex:1453, 2047, 1000 -> 01453
+			if(irValue >= 1000 && irValue <=2047) //ex:1453, 2047, 1000 -> 01453 //BE CAREFULL!!!!
 			{
 				dataString += "0";
 			}
@@ -323,7 +323,7 @@ void scanSensors()
 			{
 				dataString += "0000";
 			}
-			else if(irValue > 2047)  //ex: irValue == 10000 -> 02047
+			else if(irValue > 2047)  //ex: irValue == 10000 -> 02047 //BE CAREFUL!!!
 			{
 				irValue = 2047;
 				dataString += "0";
