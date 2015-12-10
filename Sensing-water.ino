@@ -199,6 +199,8 @@ void loop()
 
 void scanSensors()
 {
+	int currentDepth = holeDepth; //resetting the depth
+
 	//for RTC
 	File dataFile = SD.open("datalog7.txt", FILE_WRITE);
 	DateTime now = rtc.now();
@@ -285,16 +287,56 @@ void scanSensors()
 			//Serial.println(outputValue);
 
 			//rValue = ((5000 - (float)outputValue)/(float)dResistor)/((float)outputValue/(((float)dResistor)*1000));
-			rValue = dResistor*(vDD - outputValue)/outputValue;
+			if(outputValue!= 0)
+			{
+				rValue = dResistor*(vDD - outputValue)/outputValue;
+			}
+			else 
+			{
+				rValue = 2047;
+			}
+
 			//Serial.print("calculated R y");
 			//Serial.print(count);
 			//Serial.println(": ");
 			//Serial.println(rValue);
 
-			//------
-			dataString += String(rValue);
+			//------making the right log format
+			dataString += "0";
+			dataString += String(currentDepth);
+			currentDepth -= sensorInterval;
+
+			int irValue = (int)rValue;
+			if(irValue >= 1000 && irValue <=2047) //ex:1453, 2047, 1000 -> 01453
+			{
+				dataString += "0";
+			}
+			else if(irValue < 1000 && irValue >= 100) //ex: irValue == 999 ,101 or 100 ->00999
+			{
+				dataString += "00";
+			}
+			else if(irValue < 100 && irValue >= 10)  //ex: irValue == 99, 11 or 10 -> 00099
+			{
+				dataString += "000";
+			}
+			else if(irValue < 10 && irValue >= 0) // ex: irValue == 9, 1 or 0 -> 00009, 00000
+			{
+				dataString += "0000";
+			}
+			else if(irValue > 2047)  //ex: irValue == 10000 -> 02047
+			{
+				irValue = 2047;
+				dataString += "0";
+			}
+			else 
+			{
+				Serial.println("have weird irValue.");
+			}
+
+			dataString += String(irValue);
+			//------END of making right log format
 			//if (count < 15) {
-				dataString += ", ";
+			//	dataString += ", ";
 			//}
 			//------
 			//Serial.println();
