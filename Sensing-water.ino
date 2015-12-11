@@ -48,7 +48,7 @@ int r3 = 0;
 int mux = 0;
 int count = 0;   //which y pin we are selectingint r0 = 0;      //value of select pin at the 4051 (s0)
 
-int sensorPin[] = { 0, 1, 2};
+int sensorPin[] = { 0, 1, 2, 3};
 
 // select the input pin for the potentiometer
 //int ledPin = 13;      // select the pin for the LED
@@ -279,61 +279,8 @@ void scanSensors()
 			//Serial.println(": ");
 			//Serial.println(sensorValue);
 
-			outputValue = convert(sensorValue, 0, 1023, 0, vDD);
-			//outputValue = convert(sensorValue, 0, 1023, 0, 5.0);
-			//Serial.print("input mV y");
-			//Serial.print(count);
-			//Serial.println(": ");
-			//Serial.println(outputValue);
-
-			//rValue = ((5000 - (float)outputValue)/(float)dResistor)/((float)outputValue/(((float)dResistor)*1000));
-			if(outputValue!= 0)
-			{
-				rValue = dResistor*(vDD - outputValue)/outputValue;
-			}
-			else 
-			{
-				rValue = 2047; //BE CAREFUL.......!!
-			}
-
-			//Serial.print("calculated R y");
-			//Serial.print(count);
-			//Serial.println(": ");
-			//Serial.println(rValue);
-
-			//------making the right log format
-			dataString += "0";
-			dataString += String(currentDepth);
+			dataString += formatLog(sensorValue, currentDepth);
 			currentDepth -= sensorInterval;
-
-			int irValue = (int)rValue;
-			if(irValue >= 1000 && irValue <=2047) //ex:1453, 2047, 1000 -> 01453 //BE CAREFULL!!!!
-			{
-				dataString += "0";
-			}
-			else if(irValue < 1000 && irValue >= 100) //ex: irValue == 999 ,101 or 100 ->00999
-			{
-				dataString += "00";
-			}
-			else if(irValue < 100 && irValue >= 10)  //ex: irValue == 99, 11 or 10 -> 00099
-			{
-				dataString += "000";
-			}
-			else if(irValue < 10 && irValue >= 0) // ex: irValue == 9, 1 or 0 -> 00009, 00000
-			{
-				dataString += "0000";
-			}
-			else if(irValue > 2047)  //ex: irValue == 10000 -> 02047 //BE CAREFUL!!!
-			{
-				irValue = 2047;
-				dataString += "0";
-			}
-			else 
-			{
-				Serial.println("have weird irValue.");
-			}
-
-			dataString += String(irValue);
 			//------END of making right log format
 			//if (count < 15) {
 			//	dataString += ", ";
@@ -350,6 +297,13 @@ void scanSensors()
 
 			// open the file. note that only one file can be open at a time,
 		// so you have to close this one before opening another.
+
+	//sensor 49(was not in the MUX array) ----
+	sensorValue = analogRead(sensorPin[3]);
+	dataString += formatLog(sensorValue, currentDepth);//return a string waiting to be written
+	//currentDepth -= sensorInterval; //last one so no need to subtract again
+
+
 	Serial.println("		writing sensor data... ");//--all at once
 	if (dataFile) 
 	{
@@ -368,6 +322,55 @@ void scanSensors()
 
 	//delay(7000);
 	dataFile.close();
+}
+
+String formatLog(int sensorValue, int currentDepth)
+{
+	String tempString = "";
+	outputValue = convert(sensorValue, 0, 1023, 0, vDD);
+	if(outputValue!= 0)
+	{
+		rValue = dResistor*(vDD - outputValue)/outputValue;
+	}
+	else 
+	{
+		rValue = 2047; //BE CAREFUL.......!!
+	}
+
+	tempString += "0";
+	tempString += String(currentDepth);
+
+
+	int irValue = (int)rValue;
+	if(irValue >= 1000 && irValue <=2047) //ex:1453, 2047, 1000 -> 01453 //BE CAREFULL!!!!
+	{
+		tempString += "0";
+	}
+	else if(irValue < 1000 && irValue >= 100) //ex: irValue == 999 ,101 or 100 ->00999
+	{
+		tempString += "00";
+	}
+	else if(irValue < 100 && irValue >= 10)  //ex: irValue == 99, 11 or 10 -> 00099
+	{
+		tempString += "000";
+	}
+	else if(irValue < 10 && irValue >= 0) // ex: irValue == 9, 1 or 0 -> 00009, 00000
+	{
+		tempString += "0000";
+	}
+	else if(irValue > 2047)  //ex: irValue == 10000 -> 02047 //BE CAREFUL!!!
+	{
+		irValue = 2047;
+		tempString += "0";
+	}
+	else 
+	{
+		Serial.println("have weird irValue.");
+	}
+
+	tempString += String(irValue);
+
+	return tempString;
 }
 
 float convert(float value, float in_min, float in_max, float out_min, float out_max)
