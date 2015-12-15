@@ -54,18 +54,21 @@ int sensorPin[] = { 0, 1, 2, 3};
 //int ledPin = 13;      // select the pin for the LED
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
+// ---------CHANGE HERE BASED ON WHAT YOU NEED---------------------
 int holeDepth = 4500;//for having log
 int sensorInterval= 25; //for having log
 int timeInterval = 10; //mins ex: 10 mins onece
 int sampleNumbers = 10; //0,10,20,30,40,50,60,70,80,90mins
-bool saltStatus = false; //knowing whether it is salted or not
 
 float dResistor = 2168;
 //float dResistor = 9960;//another test for accuracy
+float vDD = 4970;
+//--------------------------------------------------------
+
+
 float outputValue = 0.0;
 float rValue = 0.0;
-float vDD = 4970;
-
+bool saltStatus = false; //knowing whether it is salted or not
 
 //--------------for UI and Control Flow
 int inputCommand = 0;
@@ -202,27 +205,11 @@ void scanSensors()
 	int currentDepth = holeDepth; //resetting the depth
 
 	//for RTC
-	File dataFile = SD.open("datalog7.txt", FILE_WRITE);
+	File dataFile = SD.open("test1.txt", FILE_WRITE);
 	DateTime now = rtc.now();
 
 	// make a string for assembling the data to log:
 	String timeStamp = "";
-	/*
-	Serial.print(now.year(), DEC);
-	Serial.print('/');
-	Serial.print(now.month(), DEC);
-	Serial.print('/');
-	Serial.print(now.day(), DEC);
-	Serial.print(" (");
-	Serial.print(daysOfTheWeek[now.dayOfTheWeek()]);
-	Serial.print(") ");
-	Serial.print(now.hour(), DEC);
-	Serial.print(':');
-	Serial.print(now.minute(), DEC);
-	Serial.print(':');
-	Serial.print(now.second(), DEC);
-	Serial.println();
-	*/
 
 	timeStamp += String(now.year());
 	timeStamp += String(now.month());
@@ -319,7 +306,6 @@ void scanSensors()
 		Serial.println("error opening datalog.txt");
 	}
 	//delay(1000);
-
 	//delay(7000);
 	dataFile.close();
 }
@@ -327,19 +313,26 @@ void scanSensors()
 String formatLog(int sensorValue, int currentDepth)
 {
 	String tempString = "";
-	outputValue = convert(sensorValue, 0, 1023, 0, vDD);
-	if(outputValue!= 0)
-	{
-		rValue = dResistor*(vDD - outputValue)/outputValue;
-	}
-	else 
-	{
-		rValue = 2047; //BE CAREFUL.......!!
-	}
+	String consoleString = "";
+	int infiniteStatus = 0; //0: under 2047, 1:>2047, 2: inf.
 
 	tempString += "0";
 	tempString += String(currentDepth);
 
+	consoleString += "(";
+	//for debugging
+
+	outputValue = convert(sensorValue, 0, 1023, 0, vDD);
+	if(outputValue!= 0)
+	{
+		rValue = dResistor*(vDD - outputValue)/outputValue;
+		infiniteStatus = 0;
+	}
+	else 
+	{
+		rValue = 2047; //BE CAREFUL.......!!
+		infiniteStatus = 2; 
+	}
 
 	int irValue = (int)rValue;
 	if(irValue >= 1000 && irValue <=2047) //ex:1453, 2047, 1000 -> 01453 //BE CAREFULL!!!!
@@ -362,6 +355,7 @@ String formatLog(int sensorValue, int currentDepth)
 	{
 		irValue = 2047;
 		tempString += "0";
+		infiniteStatus = 1;
 	}
 	else 
 	{
@@ -369,6 +363,23 @@ String formatLog(int sensorValue, int currentDepth)
 	}
 
 	tempString += String(irValue);
+	consoleString += tempString;
+
+	if(infiniteStatus == 2)
+	{
+		consoleString += "- Inf.) ";
+	}
+	else if(infiniteStatus == 1)
+	{
+		
+		consoleString += "- >2047) ";
+	}
+	else //infiniteStatus = 0
+	{
+		consoleString += "- Normal) ";
+	}
+
+	Serial.println(consoleString);
 
 	return tempString;
 }
