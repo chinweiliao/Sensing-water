@@ -55,6 +55,8 @@ int sensorPin[] = { 0, 1, 2, 3};
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 // ---------CHANGE HERE BASED ON WHAT YOU NEED---------------------
+char* fileName = "test123.txt";
+
 int holeDepth = 4500;//for having log
 int sensorInterval= 25; //for having log
 int timeInterval = 10; //mins ex: 10 mins onece
@@ -63,7 +65,7 @@ int sampleNumbers = 10; //0,10,20,30,40,50,60,70,80,90mins
 float dResistor = 2168;
 //float dResistor = 9960;//another test for accuracy
 float vDD = 4970;
-//--------------------------------------------------------
+//------------------------------------------------------------------
 
 
 float outputValue = 0.0;
@@ -205,21 +207,32 @@ void scanSensors()
 	int currentDepth = holeDepth; //resetting the depth
 
 	//for RTC
-	File dataFile = SD.open("test1.txt", FILE_WRITE);
+	File dataFile = SD.open(fileName, FILE_WRITE);
 	DateTime now = rtc.now();
 
 	// make a string for assembling the data to log:
 	String timeStamp = "";
 
+
 	timeStamp += String(now.year());
+	timeStamp += "/";
 	timeStamp += String(now.month());
+	timeStamp += "/";
 	timeStamp += String(now.day());
+	timeStamp += " ";
 	timeStamp += String(now.hour());
+	timeStamp += ":";
 	timeStamp += String(now.minute());
+	timeStamp += ":";
 	timeStamp += String(now.second());
 
 	Serial.println("		Stamping time... ");
 	if (dataFile) {
+		if(stage == 0)
+		{
+		dataFile.println("===========Start scanning===========");
+		}
+
 		dataFile.println(timeStamp);
 		dataFile.println();
 		// print to the serial port too:
@@ -367,16 +380,16 @@ String formatLog(int sensorValue, int currentDepth)
 
 	if(infiniteStatus == 2)
 	{
-		consoleString += "- Inf.) ";
+		consoleString += " - Inf.) ";
 	}
 	else if(infiniteStatus == 1)
 	{
 		
-		consoleString += "- >2047) ";
+		consoleString += " - >2047) ";
 	}
 	else //infiniteStatus = 0
 	{
-		consoleString += "- Normal) ";
+		consoleString += " - Normal) ";
 	}
 
 	Serial.println(consoleString);
