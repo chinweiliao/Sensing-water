@@ -62,9 +62,9 @@ int sensorInterval= 25; //for having log
 int timeInterval = 10; //mins ex: 10 mins onece
 int sampleNumbers = 10; //0,10,20,30,40,50,60,70,80,90mins
 
-float dResistor = 2168;
+float dResistor = 2168.0;
 //float dResistor = 9960;//another test for accuracy
-float vDD = 4970;
+float vDD = 4970.0;
 //------------------------------------------------------------------
 
 
@@ -257,6 +257,7 @@ void scanSensors()
 
 		for( count = 0; count< 16; count++)
 		{
+
 			r0 = bitRead(count, 0);
 			r1 = bitRead(count, 1);
 			r2 = bitRead(count, 2);
@@ -266,18 +267,44 @@ void scanSensors()
 			//Serial.print(r2);
 			//Serial.print(r1);
 			//Serial.println(r0);
-
 			//TODO
 			digitalWrite(s0[mux], r0);
 			digitalWrite(s1[mux], r1);
 			digitalWrite(s2[mux], r2);
 			digitalWrite(s3[mux], r3);
 			//-------------
+
+			//make sure it is OK??????
+			delay(10);
+			//
+
 			sensorValue = analogRead( sensorPin[mux]);
 			//Serial.print("initial input y");
 			//Serial.print(count);
 			//Serial.println(": ");
-			//Serial.println(sensorValue);
+			Serial.println(sensorValue);
+			Serial.println("after 10ms-");
+			Serial.print("a0: ");
+			Serial.println(analogRead(sensorPin[0]));
+			Serial.print("a1: ");
+			Serial.println(analogRead(sensorPin[1]));
+			Serial.print("a2: ");
+			Serial.println(analogRead(sensorPin[2]));
+			Serial.print("a3: ");
+			Serial.println(analogRead(sensorPin[3]));
+
+/*
+			delay(500);
+			Serial.println("after another 500ms-");
+			Serial.print("a0: ");
+			Serial.println(analogRead(sensorPin[0]));
+			Serial.print("a1: ");
+			Serial.println(analogRead(sensorPin[1]));
+			Serial.print("a2: ");
+			Serial.println(analogRead(sensorPin[2]));
+			Serial.print("a3: ");
+			Serial.println(analogRead(sensorPin[3]));
+*/
 
 			dataString += formatLog(sensorValue, currentDepth);
 			currentDepth -= sensorInterval;
@@ -288,7 +315,7 @@ void scanSensors()
 			//------
 			//Serial.println();
 			//delay(500);
-		}//end for pin 0-15
+		}//end for pin 0-15	
 		digitalWrite(en[mux], LOW);//disabling that MUX
 		//Serial.print("Finished MUX ");
 		//Serial.print(mux);
@@ -299,6 +326,8 @@ void scanSensors()
 		// so you have to close this one before opening another.
 
 	//sensor 49(was not in the MUX array) ----
+	//TODO!!!!! Add MUX or transistor to control this circuit
+	//NOW IT IS ALWAYS ON, WILL AFFECT OTHER CIRCUIT!!!!!!!!!!!!!!
 	sensorValue = analogRead(sensorPin[3]);
 	dataString += formatLog(sensorValue, currentDepth);//return a string waiting to be written
 	//currentDepth -= sensorInterval; //last one so no need to subtract again
@@ -336,9 +365,10 @@ String formatLog(int sensorValue, int currentDepth)
 	//for debugging
 
 	outputValue = convert(sensorValue, 0, 1023, 0, vDD);
+	Serial.println(outputValue);//TO BE DELETED
 	if(outputValue!= 0)
 	{
-		rValue = dResistor*(vDD - outputValue)/outputValue;
+		rValue = (dResistor*(vDD - outputValue))/outputValue;
 		infiniteStatus = 0;
 	}
 	else 
@@ -346,9 +376,19 @@ String formatLog(int sensorValue, int currentDepth)
 		rValue = 2047; //BE CAREFUL.......!!
 		infiniteStatus = 2; 
 	}
+	Serial.println(rValue);
 
-	int irValue = (int)rValue;
-	if(irValue >= 1000 && irValue <=2047) //ex:1453, 2047, 1000 -> 01453 //BE CAREFULL!!!!
+	int irValue = 0;	
+	if(rValue <=2047){
+	    irValue = (int)rValue;
+	}
+	else{
+		irValue = 2047;
+		infiniteStatus = 1;
+
+	}	
+
+	if(irValue >= 1000) //ex:1453, 2047, 1000 -> 01453 //BE CAREFULL!!!!
 	{
 		tempString += "0";
 	}
@@ -364,15 +404,10 @@ String formatLog(int sensorValue, int currentDepth)
 	{
 		tempString += "0000";
 	}
-	else if(irValue > 2047)  //ex: irValue == 10000 -> 02047 //BE CAREFUL!!!
-	{
-		irValue = 2047;
-		tempString += "0";
-		infiniteStatus = 1;
-	}
 	else 
 	{
-		Serial.println("have weird irValue.");
+		Serial.print("have weird irValue: ");
+		Serial.println(irValue);
 	}
 
 	tempString += String(irValue);
