@@ -275,7 +275,7 @@ void scanSensors()
 			//-------------
 
 			//make sure it is OK??????
-			delay(1600);
+			delay(50);
 			// TODO add different time
 
 			sensorValue = analogRead( sensorPin[mux]);
@@ -283,7 +283,7 @@ void scanSensors()
 			//Serial.print(count);
 			//Serial.println(": ");
 			Serial.println(sensorValue);
-			Serial.println("after 1600ms-");
+			Serial.println("after 50ms-");
 			Serial.print("a0: ");
 			Serial.println(analogRead(sensorPin[0]));
 			Serial.print("a1: ");
@@ -293,7 +293,7 @@ void scanSensors()
 			Serial.print("a3: ");
 			Serial.println(analogRead(sensorPin[3]));
 
-
+/*
 			delay(500);
 			Serial.println("after another 500ms-");
 			Serial.print("a0: ");
@@ -304,7 +304,7 @@ void scanSensors()
 			Serial.println(analogRead(sensorPin[2]));
 			Serial.print("a3: ");
 			Serial.println(analogRead(sensorPin[3]));
-
+*/
 			dataString += formatLog(sensorValue, currentDepth);
 			currentDepth -= sensorInterval;
 			//------END of making right log format
@@ -316,9 +316,9 @@ void scanSensors()
 			//delay(500);
 		}//end for pin 0-15	
 		digitalWrite(en[mux], LOW);//disabling that MUX
-		//Serial.print("Finished MUX ");
-		//Serial.print(mux);
-		//Serial.println(".");
+		Serial.print(">>>>>>>>>>>Finished MUX ");
+		Serial.print(mux);
+		Serial.println(".");
 	}//-------end for mux 0-2
 
 			// open the file. note that only one file can be open at a time,
