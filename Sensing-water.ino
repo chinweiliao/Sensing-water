@@ -316,9 +316,11 @@ void scanSensors()
 			//delay(500);
 		}//end for pin 0-15	
 		digitalWrite(en[mux], LOW);//disabling that MUX
-		Serial.print(">>>>>>>>>>>Finished MUX ");
+		Serial.print(">>>>>>>>>>>Finished MUX<<<<<<<<<<<");
 		Serial.print(mux);
 		Serial.println(".");
+		Serial.println();
+		Serial.println();
 	}//-------end for mux 0-2
 
 			// open the file. note that only one file can be open at a time,
@@ -326,12 +328,15 @@ void scanSensors()
 
 	//sensor 49(was not in the MUX array) ----
 	//TODO!!!!! Add MUX or transistor to control this circuit
+	//TODO-----------------------------------------------------------------------
 	//NOW IT IS ALWAYS ON, WILL AFFECT OTHER CIRCUIT!!!!!!!!!!!!!!
 	sensorValue = analogRead(sensorPin[3]);
 	dataString += formatLog(sensorValue, currentDepth);//return a string waiting to be written
 	//currentDepth -= sensorInterval; //last one so no need to subtract again
 
+	//---------------------------------------------------------------------------
 
+	
 	Serial.println("		writing sensor data... ");//--all at once
 	if (dataFile) 
 	{
