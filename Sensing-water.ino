@@ -48,7 +48,7 @@ int r3 = 0;
 int mux = 0;
 int count = 0;   //which y pin we are selectingint r0 = 0;      //value of select pin at the 4051 (s0)
 
-int sensorPin[] = { 0, 1, 2, 3};
+int sensorPin = 0;
 
 // select the input pin for the potentiometer
 //int ledPin = 13;      // select the pin for the LED
@@ -280,22 +280,23 @@ void scanSensors()
 			delay(50);
 			// TODO add different time
 
-			sensorValue = analogRead( sensorPin[mux]);
+			sensorValue = analogRead(sensorPin);
 			//Serial.print("initial input y");
 			//Serial.print(count);
 			//Serial.println(": ");
 			Serial.println(sensorValue);
 			Serial.println("after 50ms-");
 			Serial.print("a0: ");
-			Serial.println(analogRead(sensorPin[0]));
+			Serial.println(analogRead(sensorPin));
+			/*
 			Serial.print("a1: ");
 			Serial.println(analogRead(sensorPin[1]));
 			Serial.print("a2: ");
 			Serial.println(analogRead(sensorPin[2]));
 			Serial.print("a3: ");
 			Serial.println(analogRead(sensorPin[3]));
-
-/*
+			*/
+			/*
 			delay(500);
 			Serial.println("after another 500ms-");
 			Serial.print("a0: ");
@@ -306,7 +307,7 @@ void scanSensors()
 			Serial.println(analogRead(sensorPin[2]));
 			Serial.print("a3: ");
 			Serial.println(analogRead(sensorPin[3]));
-*/
+			*/
 			dataString += formatLog(sensorValue, currentDepth);
 			currentDepth -= sensorInterval;
 			//------END of making right log format
@@ -334,7 +335,7 @@ void scanSensors()
 	//NOW IT IS ALWAYS ON, WILL AFFECT OTHER CIRCUIT!!!!!!!!!!!!!!
 	digitalWrite(43, HIGH);
 	delay(50);
-	sensorValue = analogRead(sensorPin[3]);
+	sensorValue = analogRead(sensorPin);
 	digitalWrite(43, LOW);
 	dataString += formatLog(sensorValue, currentDepth);//return a string waiting to be written
 	//currentDepth -= sensorInterval; //last one so no need to subtract again
