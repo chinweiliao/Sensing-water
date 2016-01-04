@@ -31,10 +31,10 @@ RTC_DS1307 rtc;
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 //----for pins-----//
-int s0[] = { 22, 23, 30};
-int s1[] = { 24, 25, 32};
-int s2[] = { 26, 27, 34};
-int s3[] = { 28, 29, 36};
+int s0 = 22;
+int s1 = 24;
+int s2 = 26;
+int s3 = 28;
 
 int en[] = {40, 41, 42};
 
@@ -80,25 +80,26 @@ bool prompt = false;
 
 void setup() 
 {
-        pinMode(43, OUTPUT);
+    pinMode(43, OUTPUT);
 	// put your setup code here, to run once:
+
+	pinMode(s0, OUTPUT);
+    pinMode(s1, OUTPUT);
+    pinMode(s2, OUTPUT);
+    pinMode(s3, OUTPUT);
+
+	digitalWrite(s0, LOW);
+	digitalWrite(s1, LOW);
+	digitalWrite(s2, LOW);  
+	digitalWrite(s3, LOW);
+
 	for(int i = 0; i<3; i++) ////-----------------TODO
 	{
-	    pinMode(s0[i], OUTPUT);
-	    pinMode(s1[i], OUTPUT);
-	    pinMode(s2[i], OUTPUT);
-	    pinMode(s3[i], OUTPUT);
-	    
 	    pinMode(en[i], OUTPUT);
 	}
 
 	for(int i = 0; i<3; i++) ////-----------------TODO
 	{
-		digitalWrite(s0[i], LOW);
-		digitalWrite(s1[i], LOW);
-		digitalWrite(s2[i], LOW);  
-		digitalWrite(s3[i], LOW);
-
 		digitalWrite(en[i], LOW);
 	}
 	  //deactiviate all muxwhile starting
@@ -269,10 +270,10 @@ void scanSensors()
 			//Serial.print(r1);
 			//Serial.println(r0);
 			//TODO
-			digitalWrite(s0[mux], r0);
-			digitalWrite(s1[mux], r1);
-			digitalWrite(s2[mux], r2);
-			digitalWrite(s3[mux], r3);
+			digitalWrite(s0, r0);
+			digitalWrite(s1, r1);
+			digitalWrite(s2, r2);
+			digitalWrite(s3, r3);
 			//-------------
 
 			//make sure it is OK??????
