@@ -80,6 +80,7 @@ bool prompt = false;
 
 void setup() 
 {
+        pinMode(43, OUTPUT);
 	// put your setup code here, to run once:
 	for(int i = 0; i<3; i++) ////-----------------TODO
 	{
@@ -330,7 +331,10 @@ void scanSensors()
 	//TODO!!!!! Add MUX or transistor to control this circuit
 	//TODO-----------------------------------------------------------------------
 	//NOW IT IS ALWAYS ON, WILL AFFECT OTHER CIRCUIT!!!!!!!!!!!!!!
+	digitalWrite(43, HIGH);
+	delay(50);
 	sensorValue = analogRead(sensorPin[3]);
+	digitalWrite(43, LOW);
 	dataString += formatLog(sensorValue, currentDepth);//return a string waiting to be written
 	//currentDepth -= sensorInterval; //last one so no need to subtract again
 
