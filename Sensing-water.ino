@@ -62,9 +62,10 @@ int sensorInterval= 25; //for having log
 int timeInterval = 10; //mins ex: 10 mins onece
 int sampleNumbers = 10; //0,10,20,30,40,50,60,70,80,90mins
 
-float dResistor = 2168.0;
-//float dResistor = 9960;//another test for accuracy
-float vDD = 4970.0;
+//float dResistor = 2174.0;
+float dResistor = 261.0;
+//float vDD = 5040.0; //9v
+float vDD = 4550.0; //using computer
 
 
 //------------------------------------------------------------------
