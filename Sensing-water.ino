@@ -55,7 +55,7 @@ int sensorPin = 0;
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 // ---------CHANGE HERE BASED ON WHAT YOU NEED---------------------
-char* fileName = "test123.txt";
+char* fileName = "atoffice.txt";
 
 int holeDepth = 4500;//for having log
 int sensorInterval= 25; //for having log
@@ -65,6 +65,8 @@ int sampleNumbers = 10; //0,10,20,30,40,50,60,70,80,90mins
 float dResistor = 2168.0;
 //float dResistor = 9960;//another test for accuracy
 float vDD = 4970.0;
+
+
 //------------------------------------------------------------------
 
 
@@ -184,7 +186,7 @@ void loop()
                 Serial.print(i);
                 Serial.println("0 mins sensor scanning-------");
                 scanSensors();
-                if(i < 9)delay(5000);
+                if(i < 9)delay(timeInterval*60000);
             }
             Serial.println("-------finish scanning with salt...");
             Serial.println(">>>entering y to start another round<<<");
