@@ -55,21 +55,22 @@ int sensorPin = 0;
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 // ---------CHANGE HERE BASED ON WHAT YOU NEED---------------------
-char* fileName = "atoffice.txt";
+char* fileName = "atsite0107.txt";
 
-int holeDepth = 4500;//for having log
-int sensorInterval= 25; //for having log
-int timeInterval = 10; //mins ex: 10 mins onece
-int sampleNumbers = 10; //0,10,20,30,40,50,60,70,80,90mins
+int holeDepth = 4500;//unit: cm. for having log
+int sensorInterval= 25; //unit: cm. for having log DONE
+int timeInterval = 5; //unit: mins. ex: 5 mins onece  DONE
+int sampleNumbers = 10; //unit: times. 0,10,20,30,40,50,60,70,80,90mins  DONE
 
 //float dResistor = 2174.0;
 float dResistor = 261.0;
-//float vDD = 5040.0; //9v
-float vDD = 4550.0; //using computer
+float vDD = 5040.0; //9v
+//float vDD = 4550.0; //using computer
 
 
 //------------------------------------------------------------------
 
+int sensorCount = 1;
 
 float outputValue = 0.0;
 float rValue = 0.0;
@@ -180,14 +181,17 @@ void loop()
         else if(inputCommand == 121 && stage == 1)
         {
             Serial.println("	start scanning with salt...");
-            for(int i = 0; i<= 9; i++)
+            for(int i = 0; i<= sampleNumbers - 1; i++)
             {
                 //to be changed
                 Serial.print("	");
                 Serial.print(i);
                 Serial.println("0 mins sensor scanning-------");
                 scanSensors();
-                if(i < 9)delay(timeInterval*60000);
+                if(i < sampleNumbers - 1)
+                {
+                	delay(timeInterval*60000);
+                }
             }
             Serial.println("-------finish scanning with salt...");
             Serial.println(">>>entering y to start another round<<<");
@@ -287,10 +291,14 @@ void scanSensors()
 			//Serial.print("initial input y");
 			//Serial.print(count);
 			//Serial.println(": ");
-			Serial.println(sensorValue);
-			Serial.println("after 50ms-");
+			Serial.print("Sensor No.");
+			Serial.println(sensorCount);
+			sensorCount++;
 			Serial.print("a0: ");
-			Serial.println(analogRead(sensorPin));
+			Serial.println(sensorValue);
+			//Serial.println("after 50ms-");
+			
+			//Serial.println(analogRead(sensorPin));
 			/*
 			Serial.print("a1: ");
 			Serial.println(analogRead(sensorPin[1]));
@@ -336,10 +344,15 @@ void scanSensors()
 	//TODO!!!!! Add MUX or transistor to control this circuit
 	//TODO-----------------------------------------------------------------------
 	//NOW IT IS ALWAYS ON, WILL AFFECT OTHER CIRCUIT!!!!!!!!!!!!!!
+	Serial.print("Sesnor No.");
+	Serial.println(sensorCount);
+	sensorCount = 1; //make it back to 1 again
 	digitalWrite(43, HIGH);
 	delay(50);
 	sensorValue = analogRead(sensorPin);
 	digitalWrite(43, LOW);
+	Serial.print("a0: ");
+	Serial.println(sensorValue);
 	dataString += formatLog(sensorValue, currentDepth);//return a string waiting to be written
 	//currentDepth -= sensorInterval; //last one so no need to subtract again
 
@@ -378,7 +391,7 @@ String formatLog(int sensorValue, int currentDepth)
 	//for debugging
 
 	outputValue = convert(sensorValue, 0, 1023, 0, vDD);
-	Serial.println(outputValue);//TO BE DELETED
+	//Serial.println(outputValue);//TO BE DELETED
 	if(outputValue!= 0)
 	{
 		rValue = (dResistor*(vDD - outputValue))/outputValue;
