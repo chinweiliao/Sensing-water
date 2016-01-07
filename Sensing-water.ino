@@ -55,12 +55,14 @@ int sensorPin = 0;
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 // ---------CHANGE HERE BASED ON WHAT YOU NEED---------------------
-char* fileName = "atsite0107.txt";
+char* fileName = "site0107.txt";
 
-int holeDepth = 4500;//unit: cm. for having log
+int holeDepth = 5000;//unit: cm. for having log
+//int holeDepth = 4000;
+//int holeDepth = 3000;
 int sensorInterval= 25; //unit: cm. for having log DONE
-int timeInterval = 5; //unit: mins. ex: 5 mins onece  DONE
-int sampleNumbers = 10; //unit: times. 0,10,20,30,40,50,60,70,80,90mins  DONE
+int timeInterval = 2; //unit: mins. ex: 5 mins onece  DONE
+int sampleNumbers = 8; //unit: times. 0,10,20,30,40,50,60,70,80,90mins  DONE
 
 //float dResistor = 2174.0;
 float dResistor = 261.0;
@@ -150,6 +152,7 @@ void loop()
 	if(prompt == false)
     {
         Serial.println("Enter y after setting up the line...");
+        Serial.println(holeDepth);
         prompt = true;
     }
 
