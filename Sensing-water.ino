@@ -16,7 +16,7 @@ The circuit:
 // used as the CS pin, the hardware CS pin (10 on most Arduino boards,
 // 53 on the Mega) must be left as an output or the SD library
 // functions will not work.
-const int chipSelect = 53;
+const int chipSelect = 4;
 
 // -------code for RTC stamping
 // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
