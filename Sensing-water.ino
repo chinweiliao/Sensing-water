@@ -56,7 +56,7 @@ int sensorPin = 0;
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 // ---------CHANGE HERE BASED ON WHAT YOU NEED---------------------
-char* fileName = "site0107.txt";
+char* fileName = "TEST.txt";
 
 int holeDepth = 5000;//unit: cm. for having log
 //int holeDepth = 4000;
@@ -70,6 +70,7 @@ float dResistor = 261.0;
 float vDD = 5040.0; //9v
 //float vDD = 4550.0; //using computer
 
+int noSalt = 1;
 
 //------------------------------------------------------------------
 
@@ -150,7 +151,7 @@ void setup()
 void loop() 
 {
 
-	if(prompt == false)
+    if(prompt == false)
     {
         Serial.println("Enter y after setting up the line...");
         Serial.println(holeDepth);
@@ -159,14 +160,33 @@ void loop()
 
     while(Serial.available()>0)
     { 
-        inputCommand = Serial.read();
+        String temp = Serial.readStringUntil(',');  //myPort.write("1,70,25,0,2,10,");  sent from processing
+        inputCommand = temp.toInt();
+        
+         temp = Serial.readStringUntil(','); 
+         holeDepth = temp.toInt()*100;
+         
+         temp = Serial.readStringUntil(','); 
+          sensorInterval = temp.toInt();
+         
+          temp = Serial.readStringUntil(','); 
+          noSalt = temp.toInt();
+         
+          temp = Serial.readStringUntil(',');
+          sampleNumbers = temp.toInt();
+          
+          temp = Serial.readStringUntil(',');
+          timeInterval = temp.toInt();
+             
+  
+            
         /*
         Serial.print("I received: ");
                 //Serial.println(incomingByte);
         Serial.println(inputCommand);
         */
 
-        if (inputCommand == 121 && stage == 0)
+        if (inputCommand == 1 && noSalt == 1)
         { 
 
             Serial.println("	initial scanning without salt...");
@@ -177,12 +197,13 @@ void loop()
         //>>write value(initial without salt)
         //>>wait for another input
             inputCommand = 0;//cleaning input
-            stage = 1;//done initial    
+            //TODO more to reset???????!!!!
+            stage = 0;//done initial    
             Serial.println();
             Serial.println("Type another y and press ENTER after adding salt...");
 
         }
-        else if(inputCommand == 121 && stage == 1)
+        else if(inputCommand == 1 && noSalt == 0)
         {
             Serial.println("	start scanning with salt...");
             for(int i = 0; i<= sampleNumbers - 1; i++)
@@ -244,6 +265,7 @@ void scanSensors()
 		if(stage == 0)
 		{
 		dataFile.println("===========Start scanning===========");
+                stage = 1;
 		}
 
 		dataFile.println(timeStamp);
