@@ -91,7 +91,7 @@ void setup()
     pinMode(7, OUTPUT);
 	// put your setup code here, to run once:
 
-	pinMode(s0, OUTPUT);
+    pinMode(s0, OUTPUT);
     pinMode(s1, OUTPUT);
     pinMode(s2, OUTPUT);
     pinMode(s3, OUTPUT);
@@ -115,27 +115,27 @@ void setup()
 
 	Serial.begin(9600);
 	  //-----SD------ 
-	Serial.print("Initializing SD card...");
+	//---for DEBUGGING---Serial.print("Initializing SD card...");
 	// make sure that the default chip select pin is set to
 	// output, even if you don't use it:
 	pinMode(10, OUTPUT);
 
 	// see if the card is present and can be initialized:
 	if (!SD.begin(chipSelect)) {
-		Serial.println("Card failed, or not present");
+		//---for DEBUGGING---Serial.println("Card failed, or not present");
 		// don't do anything more:
 		return;
 	}
-	Serial.println("card initialized.");
+	//---for DEBUGGING---Serial.println("card initialized.");
 
 	//--------------for setting up RTC
 	if (! rtc.begin()) {
-		Serial.println("Couldn't find RTC");
+		//---for DEBUGGING---Serial.println("Couldn't find RTC");
 		while (1);
 	}
 
 	if (! rtc.isrunning()) {
-		Serial.println("RTC is NOT running!");
+		//---for DEBUGGING---Serial.println("RTC is NOT running!");
 		// following line sets the RTC to the date & time this sketch was compiled
 		rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 		// This line sets the RTC with an explicit date & time, for example to set
@@ -145,6 +145,10 @@ void setup()
 	//---------------
 	//rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 	//---------------
+
+
+
+	
 }
 
 
@@ -153,8 +157,8 @@ void loop()
 
     if(prompt == false)
     {
-        Serial.println("Enter y after setting up the line...");
-        Serial.println(holeDepth);
+        //---for DEBUGGING---Serial.println("Enter y after setting up the line...");
+        //---for DEBUGGING---Serial.println(holeDepth);
         prompt = true;
     }
 
@@ -189,7 +193,7 @@ void loop()
         if (inputCommand == 1 && noSalt == 1)
         { 
 
-            Serial.println("	initial scanning without salt...");
+            //---for DEBUGGING---Serial.println("	initial scanning without salt...");
             scanSensors();	
         //>>setting up sd card
         //>>write time stamp
@@ -199,38 +203,38 @@ void loop()
             inputCommand = 0;//cleaning input
             //TODO more to reset???????!!!!
             stage = 0;//done initial    
-            Serial.println();
-            Serial.println("Type another y and press ENTER after adding salt...");
+            //---for DEBUGGING---Serial.println();
+            //---for DEBUGGING---Serial.println("Type another y and press ENTER after adding salt...");
 
         }
         else if(inputCommand == 1 && noSalt == 0)
         {
-            Serial.println("	start scanning with salt...");
+            //---for DEBUGGING---Serial.println("	start scanning with salt...");
             for(int i = 0; i<= sampleNumbers - 1; i++)
             {
                 //to be changed
-                Serial.print("	");
-                Serial.print(i);
-                Serial.println("0 mins sensor scanning-------");
+                //---for DEBUGGING---Serial.print("	");
+                //---for DEBUGGING---Serial.print(i);
+                //---for DEBUGGING---Serial.println("0 mins sensor scanning-------");
                 scanSensors();
                 if(i < sampleNumbers - 1)
                 {
                 	delay(timeInterval*60000);
                 }
             }
-            Serial.println("-------finish scanning with salt...");
-            Serial.println(">>>entering y to start another round<<<");
+            //---for DEBUGGING---Serial.println("-------finish scanning with salt...");
+            //---for DEBUGGING---Serial.println(">>>entering y to start another round<<<");
             inputCommand = 0;
             stage = 0;
 
         }
         else if(stage == 1)
         {
-            Serial.println("invalid input with stage 1");
+            //---for DEBUGGING---Serial.println("invalid input with stage 1");
         }
         else if(stage == 0)
         {
-            Serial.println("invalid input with stage 0");
+            //---for DEBUGGING---Serial.println("invalid input with stage 0");
         }
     }//-----END while
 
@@ -260,7 +264,7 @@ void scanSensors()
 	timeStamp += ":";
 	timeStamp += String(now.second());
 
-	Serial.println("		Stamping time... ");
+	//---for DEBUGGING---Serial.println("		Stamping time... ");
 	if (dataFile) {
 		if(stage == 0)
 		{
@@ -271,12 +275,12 @@ void scanSensors()
 		dataFile.println(timeStamp);
 		dataFile.println();
 		// print to the serial port too:
-		Serial.print("		");
-		Serial.println(timeStamp);
-		Serial.println("		finished stamping!");
+		//---for DEBUGGING---Serial.print("		");
+		//---for DEBUGGING---Serial.println(timeStamp);
+		//---for DEBUGGING---Serial.println("		finished stamping!");
 		}
 		else {
-		Serial.println("error opening datalog.txt");
+		//---for DEBUGGING---Serial.println("error opening datalog.txt");
 	}
 
 	String dataString = "";
@@ -314,37 +318,13 @@ void scanSensors()
 			// TODO add different time
 
 			sensorValue = analogRead(sensorPin);
-			//Serial.print("initial input y");
-			//Serial.print(count);
-			//Serial.println(": ");
-			Serial.print("Sensor No.");
-			Serial.println(sensorCount);
+
+			//---for DEBUGGING---Serial.print("Sensor No.");
+			//---for DEBUGGING---Serial.println(sensorCount);
 			sensorCount++;
-			Serial.print("a0: ");
-			Serial.println(sensorValue);
-			//Serial.println("after 50ms-");
-			
-			//Serial.println(analogRead(sensorPin));
-			/*
-			Serial.print("a1: ");
-			Serial.println(analogRead(sensorPin[1]));
-			Serial.print("a2: ");
-			Serial.println(analogRead(sensorPin[2]));
-			Serial.print("a3: ");
-			Serial.println(analogRead(sensorPin[3]));
-			*/
-			/*
-			delay(500);
-			Serial.println("after another 500ms-");
-			Serial.print("a0: ");
-			Serial.println(analogRead(sensorPin[0]));
-			Serial.print("a1: ");
-			Serial.println(analogRead(sensorPin[1]));
-			Serial.print("a2: ");
-			Serial.println(analogRead(sensorPin[2]));
-			Serial.print("a3: ");
-			Serial.println(analogRead(sensorPin[3]));
-			*/
+			//---for DEBUGGING---Serial.print("a0: ");
+			//---for DEBUGGING---Serial.println(sensorValue);
+
 			dataString += formatLog(sensorValue, currentDepth);
 			currentDepth -= sensorInterval;
 			//------END of making right log format
@@ -352,52 +332,48 @@ void scanSensors()
 			//	dataString += ", ";
 			//}
 			//------
-			Serial.println();
+			//---for DEBUGGING---Serial.println();
 			//delay(500);
 		}//end for pin 0-15	
 		digitalWrite(en[mux], LOW);//disabling that MUX
-		Serial.print(">>>>>>>>>>>Finished MUX<<<<<<<<<<<");
-		Serial.print(mux);
-		Serial.println(".");
-		Serial.println();
-		Serial.println();
+		//---for DEBUGGING---Serial.print(">>>>>>>>>>>Finished MUX<<<<<<<<<<<");
+		//---for DEBUGGING---Serial.print(mux);
+		//---for DEBUGGING---Serial.println(".");
+		//---for DEBUGGING---Serial.println();
+		//---for DEBUGGING---Serial.println();
 	}//-------end for mux 0-2
 
-			// open the file. note that only one file can be open at a time,
-		// so you have to close this one before opening another.
-
 	//sensor 49(was not in the MUX array) ----
-	//TODO!!!!! Add MUX or transistor to control this circuit
-	//TODO-----------------------------------------------------------------------
-	//NOW IT IS ALWAYS ON, WILL AFFECT OTHER CIRCUIT!!!!!!!!!!!!!!
-	Serial.print("Sesnor No.");
-	Serial.println(sensorCount);
+	//---for DEBUGGING---Serial.print("Sesnor No.");
+	//---for DEBUGGING---Serial.println(sensorCount);
 	sensorCount = 1; //make it back to 1 again
 	digitalWrite(7, HIGH);
 	delay(50);
 	sensorValue = analogRead(sensorPin);
 	digitalWrite(7, LOW);
-	Serial.print("a0: ");
-	Serial.println(sensorValue);
+	//---for DEBUGGING---Serial.print("a0: ");
+	//---for DEBUGGING---Serial.println(sensorValue);
 	dataString += formatLog(sensorValue, currentDepth);//return a string waiting to be written
 	//currentDepth -= sensorInterval; //last one so no need to subtract again
 
 	//---------------------------------------------------------------------------
 
 	
-	Serial.println("		writing sensor data... ");//--all at once
+	//---for DEBUGGING---Serial.println("		writing sensor data... ");//--all at once
 	if (dataFile) 
 	{
 		dataFile.println(dataString);
 		dataFile.println("------------------------");
 		// print to the serial port too:
-		Serial.print("		");
+                //writeString(dataString);
+                //Serial.write(test);
+		//---for DEBUGGING---Serial.print("		");
 		Serial.println(dataString);
-		Serial.println("		finished writing!");
+		//---for DEBUGGING---Serial.println("		finished writing!");
 	}
 	else 
 	{
-		Serial.println("error opening datalog.txt");
+		//---for DEBUGGING---Serial.println("error opening datalog.txt");
 	}
 	//delay(1000);
 	//delay(7000);
@@ -428,7 +404,7 @@ String formatLog(int sensorValue, int currentDepth)
 		rValue = 2047; //BE CAREFUL.......!!
 		infiniteStatus = 2; 
 	}
-	Serial.println(rValue);
+	//---for DEBUGGING---Serial.println(rValue);
 
 	int irValue = 0;	
 	if(rValue <=2047){
@@ -458,8 +434,8 @@ String formatLog(int sensorValue, int currentDepth)
 	}
 	else 
 	{
-		Serial.print("have weird irValue: ");
-		Serial.println(irValue);
+	//---for DEBUGGING---	Serial.print("have weird irValue: ");
+	//---for DEBUGGING---	Serial.println(irValue);
 	}
 
 	tempString += String(irValue);
@@ -479,7 +455,7 @@ String formatLog(int sensorValue, int currentDepth)
 		consoleString += " - Normal) ";
 	}
 
-	Serial.println(consoleString);
+	//---for DEBUGGING---Serial.println(consoleString);
 
 	return tempString;
 }
@@ -488,3 +464,5 @@ float convert(float value, float in_min, float in_max, float out_min, float out_
 {
 	return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
+
+
