@@ -71,7 +71,7 @@ float vDD = 5040.0; //9v
 //float vDD = 4550.0; //using computer
 
 int noSalt = 1;
-
+bool connectingStatus = false;
 //------------------------------------------------------------------
 
 int sensorCount = 1;
@@ -146,21 +146,44 @@ void setup()
 	//rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 	//---------------
 
+	//estabilish contact. waiting for response.
+	//establishContact();
 
-
-	
 }
 
 
 void loop() 
 {
-
+	/*
     if(prompt == false)
     {
         //---for DEBUGGING---Serial.println("Enter y after setting up the line...");
         //---for DEBUGGING---Serial.println(holeDepth);
         prompt = true;
     }
+	*/
+	
+	while(!connectingStatus){
+
+		if(Serial.available()>0)
+		{
+			String inString = Serial.readStringUntil(',');
+			if(inString == "0") {
+				Serial.print("ok");
+				connectingStatus = true;
+				//TODO: how to make sure if the connection is broken during the process?????????
+			}
+			else
+			{
+				//Serial.print("didnt get x");
+			}
+		}
+		else
+		{
+			//Serial.print("no input");
+		}
+	}
+	
 
     while(Serial.available()>0)
     { 
@@ -464,5 +487,3 @@ float convert(float value, float in_min, float in_max, float out_min, float out_
 {
 	return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-
-
