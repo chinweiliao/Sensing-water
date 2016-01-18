@@ -76,8 +76,8 @@ bool connectingStatus = false;
 
 int sensorCount = 1;
 
-float outputValue = 0.0;
-float rValue = 0.0;
+//float outputValue = 0.0;
+//float rValue = 0.0;
 bool saltStatus = false; //knowing whether it is salted or not
 
 //--------------for UI and Control Flow
@@ -142,8 +142,8 @@ void setup()
 		// January 21, 2014 at 3am you would call:
 		// rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
 	}
-	//---------------
-	//rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+	//----IMPORTANT-------SET TIME BY UNCOMMENTING THIS, UPLOAD, and then COMMENT IT and UPLOAD again.--------------
+	//rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); SET TIME BY UNCOMMENTING THIS, and then COMMENT IT and UPLOAD again.
 	//---------------
 
 	//estabilish contact. waiting for response.
@@ -168,7 +168,7 @@ void loop()
 		if(Serial.available()>0)
 		{
 			String inString = Serial.readStringUntil(',');
-			if(inString == "0") {
+			if(inString == "x") {
 				Serial.print("ok");
 				connectingStatus = true;
 				//TODO: how to make sure if the connection is broken during the process?????????
@@ -307,6 +307,7 @@ void scanSensors()
 	}
 
 	String dataString = "";
+	String pcString = "";
 
 	//start sampling
 	for ( mux = 0; mux < 3; mux++ )
@@ -350,6 +351,9 @@ void scanSensors()
 
 			dataString += formatLog(sensorValue, currentDepth);
 			currentDepth -= sensorInterval;
+
+			pcString += String(sensorRawToR(sensorValue));
+			pcString += ",";
 			//------END of making right log format
 			//if (count < 15) {
 			//	dataString += ", ";
@@ -377,6 +381,8 @@ void scanSensors()
 	//---for DEBUGGING---Serial.print("a0: ");
 	//---for DEBUGGING---Serial.println(sensorValue);
 	dataString += formatLog(sensorValue, currentDepth);//return a string waiting to be written
+	pcString += String(sensorRawToR(sensorValue));
+	pcString += ",";
 	//currentDepth -= sensorInterval; //last one so no need to subtract again
 
 	//---------------------------------------------------------------------------
@@ -391,53 +397,30 @@ void scanSensors()
                 //writeString(dataString);
                 //Serial.write(test);
 		//---for DEBUGGING---Serial.print("		");
-		Serial.println(dataString);
+		Serial.println(pcString);
 		//---for DEBUGGING---Serial.println("		finished writing!");
 	}
 	else 
 	{
-		//---for DEBUGGING---Serial.println("error opening datalog.txt");
+		Serial.println("error opening files");
 	}
 	//delay(1000);
 	//delay(7000);
 	dataFile.close();
 }
 
-String formatLog(int sensorValue, int currentDepth)
+String formatLog(int sensor, int currentDepth)
 {
 	String tempString = "";
-	String consoleString = "";
-	int infiniteStatus = 0; //0: under 2047, 1:>2047, 2: inf.
+	//---for DEBUGGING---String consoleString = "";
 
 	tempString += "0";
 	tempString += String(currentDepth);
 
-	consoleString += "(";
+	//---for DEBUGGING---consoleString += "(";
 	//for debugging
 
-	outputValue = convert(sensorValue, 0, 1023, 0, vDD);
-	//Serial.println(outputValue);//TO BE DELETED
-	if(outputValue!= 0)
-	{
-		rValue = (dResistor*(vDD - outputValue))/outputValue;
-		infiniteStatus = 0;
-	}
-	else 
-	{
-		rValue = 2047; //BE CAREFUL.......!!
-		infiniteStatus = 2; 
-	}
-	//---for DEBUGGING---Serial.println(rValue);
-
-	int irValue = 0;	
-	if(rValue <=2047){
-	    irValue = (int)rValue;
-	}
-	else{
-		irValue = 2047;
-		infiniteStatus = 1;
-
-	}	
+	int irValue = sensorRawToR(sensor);
 
 	if(irValue >= 1000) //ex:1453, 2047, 1000 -> 01453 //BE CAREFULL!!!!
 	{
@@ -462,25 +445,59 @@ String formatLog(int sensorValue, int currentDepth)
 	}
 
 	tempString += String(irValue);
-	consoleString += tempString;
+	//---for DEBUGGING---consoleString += tempString;
 
+/*
 	if(infiniteStatus == 2)
 	{
-		consoleString += " - Inf.) ";
+	//---for DEBUGGING---	consoleString += " - Inf.) ";
 	}
 	else if(infiniteStatus == 1)
 	{
 		
-		consoleString += " - >2047) ";
+	//---for DEBUGGING---	consoleString += " - >2047) ";
 	}
 	else //infiniteStatus = 0
 	{
-		consoleString += " - Normal) ";
+	//---for DEBUGGING---	consoleString += " - Normal) ";
 	}
 
 	//---for DEBUGGING---Serial.println(consoleString);
-
+*/
 	return tempString;
+}
+
+int sensorRawToR(int sensor)
+{
+
+	//int infiniteStatus = 0; //0: under 2047, 1:>2047, 2: inf.
+
+	float oValue = convert(sensor, 0, 1023, 0, vDD);
+	//Serial.println(outputValue);//TO BE DELETED
+	float r = 0.0;
+	if(oValue!= 0)
+	{
+		r = (dResistor*(vDD - oValue))/oValue;
+		//infiniteStatus = 0;
+	}
+	else 
+	{
+		r = 2047; //BE CAREFUL.......!!
+		//infiniteStatus = 2; 
+	}
+	//---for DEBUGGING---Serial.println(rValue);
+
+	int integerReValue = 0;
+
+	if(r <=2047){
+	    integerReValue = (int)r;
+	}
+	else{
+		integerReValue = 2047;
+		//infiniteStatus = 1;
+
+	}
+	return integerReValue;
 }
 
 float convert(float value, float in_min, float in_max, float out_min, float out_max)
