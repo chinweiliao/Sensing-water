@@ -39,6 +39,10 @@ int s3 = 6;
 
 int en[] = {10, 9, 8};
 
+int powerLED =14; //lights up if it is powered on
+int connectingLED = 15;//lights up if it is connected with PC 
+int readingLED = 16; // on while reading/sending data.
+
 //-----
 int r0 = 0;      //value of select pin at the 4051 (s0)
 int r1 = 0;      //value of select pin at the 4051 (s1)
@@ -96,10 +100,18 @@ void setup()
     pinMode(s2, OUTPUT);
     pinMode(s3, OUTPUT);
 
+    pinMode(powerLED, OUTPUT);
+    pinMode(connectingLED, OUTPUT);
+    pinMode(readingLED, OUTPUT);
+
 	digitalWrite(s0, LOW);
 	digitalWrite(s1, LOW);
 	digitalWrite(s2, LOW);  
 	digitalWrite(s3, LOW);
+
+	digitalWrite(powerLED, HIGH);
+	digitalWrite(connectingLED, LOW);
+	digitalWrite(readingLED, LOW);
 
 	for(int i = 0; i<3; i++) ////-----------------TODO
 	{
@@ -171,6 +183,7 @@ void loop()
 			if(inString == "x") {
 				Serial.print("ok");
 				connectingStatus = true;
+				digitalWrite(connectingLED, HIGH);
 				//TODO: how to make sure if the connection is broken during the process?????????
 			}
 			else
@@ -265,6 +278,7 @@ void loop()
 
 void scanSensors()
 {
+	digitalWrite(readingLED, HIGH);
 	int currentDepth = holeDepth; //resetting the depth
 
 	//for RTC
@@ -407,6 +421,7 @@ void scanSensors()
 	//delay(1000);
 	//delay(7000);
 	dataFile.close();
+	digitalWrite(readingLED, LOW);
 }
 
 String formatLog(int sensor, int currentDepth)
