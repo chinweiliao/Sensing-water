@@ -16,7 +16,7 @@ The circuit:
 // used as the CS pin, the hardware CS pin (10 on most Arduino boards,
 // 53 on the Mega) must be left as an output or the SD library
 // functions will not work.
-const int chipSelect = 53;
+const int chipSelect = 4;
 
 // -------code for RTC stamping
 // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
@@ -31,12 +31,13 @@ RTC_DS1307 rtc;
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 //----for pins-----//
-int s0 = 22;
-int s1 = 24;
-int s2 = 26;
-int s3 = 28;
+int s0 = 2;
+int s1 = 3;
+// pin 4 is for SD shield
+int s2 = 5;
+int s3 = 6;
 
-int en[] = {40, 41, 42};
+int en[] = {10, 9, 8};
 
 //-----
 int r0 = 0;      //value of select pin at the 4051 (s0)
@@ -86,7 +87,7 @@ bool prompt = false;
 
 void setup() 
 {
-    pinMode(43, OUTPUT);
+    pinMode(7, OUTPUT);
 	// put your setup code here, to run once:
 
 	pinMode(s0, OUTPUT);
@@ -141,7 +142,7 @@ void setup()
 		// rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
 	}
 	//---------------
-	rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+	//rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 	//---------------
 }
 
@@ -350,10 +351,10 @@ void scanSensors()
 	Serial.print("Sesnor No.");
 	Serial.println(sensorCount);
 	sensorCount = 1; //make it back to 1 again
-	digitalWrite(43, HIGH);
+	digitalWrite(7, HIGH);
 	delay(50);
 	sensorValue = analogRead(sensorPin);
-	digitalWrite(43, LOW);
+	digitalWrite(7, LOW);
 	Serial.print("a0: ");
 	Serial.println(sensorValue);
 	dataString += formatLog(sensorValue, currentDepth);//return a string waiting to be written
