@@ -31,10 +31,10 @@ RTC_DS1307 rtc;
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 //----for pins-----//
-int s0[] = { 22, 23, 30};
-int s1[] = { 24, 25, 32};
-int s2[] = { 26, 27, 34};
-int s3[] = { 28, 29, 36};
+int s0 = 22;
+int s1 = 24;
+int s2 = 26;
+int s3 = 28;
 
 int en[] = {40, 41, 42};
 
@@ -48,25 +48,31 @@ int r3 = 0;
 int mux = 0;
 int count = 0;   //which y pin we are selectingint r0 = 0;      //value of select pin at the 4051 (s0)
 
-int sensorPin[] = { 0, 1, 2, 3};
+int sensorPin = 0;
 
 // select the input pin for the potentiometer
 //int ledPin = 13;      // select the pin for the LED
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 // ---------CHANGE HERE BASED ON WHAT YOU NEED---------------------
-char* fileName = "test123.txt";
+char* fileName = "site0107.txt";
 
-int holeDepth = 4500;//for having log
-int sensorInterval= 25; //for having log
-int timeInterval = 10; //mins ex: 10 mins onece
-int sampleNumbers = 10; //0,10,20,30,40,50,60,70,80,90mins
+int holeDepth = 5000;//unit: cm. for having log
+//int holeDepth = 4000;
+//int holeDepth = 3000;
+int sensorInterval= 25; //unit: cm. for having log DONE
+int timeInterval = 2; //unit: mins. ex: 5 mins onece  DONE
+int sampleNumbers = 8; //unit: times. 0,10,20,30,40,50,60,70,80,90mins  DONE
 
-float dResistor = 2168.0;
-//float dResistor = 9960;//another test for accuracy
-float vDD = 4970.0;
+//float dResistor = 2174.0;
+float dResistor = 261.0;
+float vDD = 5040.0; //9v
+//float vDD = 4550.0; //using computer
+
+
 //------------------------------------------------------------------
 
+int sensorCount = 1;
 
 float outputValue = 0.0;
 float rValue = 0.0;
@@ -80,25 +86,26 @@ bool prompt = false;
 
 void setup() 
 {
-        pinMode(43, OUTPUT);
+    pinMode(43, OUTPUT);
 	// put your setup code here, to run once:
+
+	pinMode(s0, OUTPUT);
+    pinMode(s1, OUTPUT);
+    pinMode(s2, OUTPUT);
+    pinMode(s3, OUTPUT);
+
+	digitalWrite(s0, LOW);
+	digitalWrite(s1, LOW);
+	digitalWrite(s2, LOW);  
+	digitalWrite(s3, LOW);
+
 	for(int i = 0; i<3; i++) ////-----------------TODO
 	{
-	    pinMode(s0[i], OUTPUT);
-	    pinMode(s1[i], OUTPUT);
-	    pinMode(s2[i], OUTPUT);
-	    pinMode(s3[i], OUTPUT);
-	    
 	    pinMode(en[i], OUTPUT);
 	}
 
 	for(int i = 0; i<3; i++) ////-----------------TODO
 	{
-		digitalWrite(s0[i], LOW);
-		digitalWrite(s1[i], LOW);
-		digitalWrite(s2[i], LOW);  
-		digitalWrite(s3[i], LOW);
-
 		digitalWrite(en[i], LOW);
 	}
 	  //deactiviate all muxwhile starting
@@ -145,6 +152,7 @@ void loop()
 	if(prompt == false)
     {
         Serial.println("Enter y after setting up the line...");
+        Serial.println(holeDepth);
         prompt = true;
     }
 
@@ -176,14 +184,17 @@ void loop()
         else if(inputCommand == 121 && stage == 1)
         {
             Serial.println("	start scanning with salt...");
-            for(int i = 0; i<= 9; i++)
+            for(int i = 0; i<= sampleNumbers - 1; i++)
             {
                 //to be changed
                 Serial.print("	");
                 Serial.print(i);
                 Serial.println("0 mins sensor scanning-------");
                 scanSensors();
-                if(i < 9)delay(5000);
+                if(i < sampleNumbers - 1)
+                {
+                	delay(timeInterval*60000);
+                }
             }
             Serial.println("-------finish scanning with salt...");
             Serial.println(">>>entering y to start another round<<<");
@@ -269,32 +280,37 @@ void scanSensors()
 			//Serial.print(r1);
 			//Serial.println(r0);
 			//TODO
-			digitalWrite(s0[mux], r0);
-			digitalWrite(s1[mux], r1);
-			digitalWrite(s2[mux], r2);
-			digitalWrite(s3[mux], r3);
+			digitalWrite(s0, r0);
+			digitalWrite(s1, r1);
+			digitalWrite(s2, r2);
+			digitalWrite(s3, r3);
 			//-------------
 
 			//make sure it is OK??????
 			delay(50);
 			// TODO add different time
 
-			sensorValue = analogRead( sensorPin[mux]);
+			sensorValue = analogRead(sensorPin);
 			//Serial.print("initial input y");
 			//Serial.print(count);
 			//Serial.println(": ");
-			Serial.println(sensorValue);
-			Serial.println("after 50ms-");
+			Serial.print("Sensor No.");
+			Serial.println(sensorCount);
+			sensorCount++;
 			Serial.print("a0: ");
-			Serial.println(analogRead(sensorPin[0]));
+			Serial.println(sensorValue);
+			//Serial.println("after 50ms-");
+			
+			//Serial.println(analogRead(sensorPin));
+			/*
 			Serial.print("a1: ");
 			Serial.println(analogRead(sensorPin[1]));
 			Serial.print("a2: ");
 			Serial.println(analogRead(sensorPin[2]));
 			Serial.print("a3: ");
 			Serial.println(analogRead(sensorPin[3]));
-
-/*
+			*/
+			/*
 			delay(500);
 			Serial.println("after another 500ms-");
 			Serial.print("a0: ");
@@ -305,7 +321,7 @@ void scanSensors()
 			Serial.println(analogRead(sensorPin[2]));
 			Serial.print("a3: ");
 			Serial.println(analogRead(sensorPin[3]));
-*/
+			*/
 			dataString += formatLog(sensorValue, currentDepth);
 			currentDepth -= sensorInterval;
 			//------END of making right log format
@@ -331,10 +347,15 @@ void scanSensors()
 	//TODO!!!!! Add MUX or transistor to control this circuit
 	//TODO-----------------------------------------------------------------------
 	//NOW IT IS ALWAYS ON, WILL AFFECT OTHER CIRCUIT!!!!!!!!!!!!!!
+	Serial.print("Sesnor No.");
+	Serial.println(sensorCount);
+	sensorCount = 1; //make it back to 1 again
 	digitalWrite(43, HIGH);
 	delay(50);
-	sensorValue = analogRead(sensorPin[3]);
+	sensorValue = analogRead(sensorPin);
 	digitalWrite(43, LOW);
+	Serial.print("a0: ");
+	Serial.println(sensorValue);
 	dataString += formatLog(sensorValue, currentDepth);//return a string waiting to be written
 	//currentDepth -= sensorInterval; //last one so no need to subtract again
 
@@ -373,7 +394,7 @@ String formatLog(int sensorValue, int currentDepth)
 	//for debugging
 
 	outputValue = convert(sensorValue, 0, 1023, 0, vDD);
-	Serial.println(outputValue);//TO BE DELETED
+	//Serial.println(outputValue);//TO BE DELETED
 	if(outputValue!= 0)
 	{
 		rValue = (dResistor*(vDD - outputValue))/outputValue;
