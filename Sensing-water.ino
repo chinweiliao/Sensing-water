@@ -39,7 +39,7 @@ int s3 = 6;
 
 int en[] = {10, 9, 8};
 
-int powerLED =14; //lights up if it is powered on
+int powerLED =13; //lights up if it is powered on
 int connectingLED = 15;//lights up if it is connected with PC 
 int readingLED = 16; // on while reading/sending data.
 
