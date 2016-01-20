@@ -265,7 +265,7 @@ void loop()
             stage = 1;
 
         }
-        else if(stage == 1)
+        else if(inputCommand == 2)
         {
             Serial.print("ok");
         }
