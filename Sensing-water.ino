@@ -62,12 +62,12 @@ int sensorValue = 0;  // variable to store the value coming from the sensor
 // ---------CHANGE HERE BASED ON WHAT YOU NEED---------------------
 char* fileName = "TEST.txt";
 
-int holeDepth = 5000;//unit: cm. for having log
+int holeDepth = 0;//unit: cm. for having log
 //int holeDepth = 4000;
 //int holeDepth = 3000;
-int sensorInterval= 25; //unit: cm. for having log DONE
-int timeInterval = 2; //unit: mins. ex: 5 mins onece  DONE
-int sampleNumbers = 8; //unit: times. 0,10,20,30,40,50,60,70,80,90mins  DONE
+int sensorInterval= 0; //unit: cm. for having log DONE
+int timeInterval = 0; //unit: mins. ex: 5 mins onece  DONE
+int sampleNumbers = 0; //unit: times. 0,10,20,30,40,50,60,70,80,90mins  DONE
 
 //float dResistor = 2174.0;
 float dResistor = 261.0;
@@ -175,6 +175,7 @@ void loop()
     }
 	*/
 	
+	/*-----FOR ONE TIME TESTING.
 	while(!connectingStatus){
 
 		if(Serial.available()>0)
@@ -196,7 +197,7 @@ void loop()
 			//Serial.print("no input");
 		}
 	}
-	
+	*/
 
     while(Serial.available()>0)
     { 
@@ -238,7 +239,7 @@ void loop()
         //>>wait for another input
             inputCommand = 0;//cleaning input
             //TODO more to reset???????!!!!
-            stage = 0;//done initial    
+            stage = 1;//done initial    
             //---for DEBUGGING---Serial.println();
             //---for DEBUGGING---Serial.println("Type another y and press ENTER after adding salt...");
 
@@ -261,16 +262,16 @@ void loop()
             //---for DEBUGGING---Serial.println("-------finish scanning with salt...");
             //---for DEBUGGING---Serial.println(">>>entering y to start another round<<<");
             inputCommand = 0;
-            stage = 0;
+            stage = 1;
 
         }
         else if(stage == 1)
         {
-            //---for DEBUGGING---Serial.println("invalid input with stage 1");
+            Serial.print("ok");
         }
-        else if(stage == 0)
+        else 
         {
-            //---for DEBUGGING---Serial.println("invalid input with stage 0");
+            //---for DEBUGGING---Serial.println("invalid input");
         }
     }//-----END while
 
