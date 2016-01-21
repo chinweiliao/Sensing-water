@@ -267,7 +267,7 @@ void loop()
         }
         else if(inputCommand == 2)
         {
-            Serial.print("ok");
+            Serial.print("ok,");
         }
         else 
         {
