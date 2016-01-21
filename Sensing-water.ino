@@ -66,7 +66,7 @@ int holeDepth = 0;//unit: cm. for having log
 //int holeDepth = 4000;
 //int holeDepth = 3000;
 int sensorInterval= 0; //unit: cm. for having log DONE
-int timeInterval = 0; //unit: mins. ex: 5 mins onece  DONE
+int timeInterval = 0; //unit: ms. 
 int sampleNumbers = 0; //unit: times. 0,10,20,30,40,50,60,70,80,90mins  DONE
 
 //float dResistor = 2174.0;
@@ -220,8 +220,9 @@ void loop()
 	          	sampleNumbers = temp.toInt();
 	          
 	          	temp = Serial.readStringUntil(',');
-	         	timeInterval = temp.toInt();
-
+	         	//timeInterval = temp.toInt();
+                timeInterval = (int)(temp.toFloat()*60000);
+                        
 	         	if(noSalt == 1)
 	         	{
 	         		scanSensors();
@@ -239,7 +240,7 @@ void loop()
 		                scanSensors();
 		                if(i < sampleNumbers - 1)
 		                {
-		                	delay(timeInterval*60000);
+		                	delay(timeInterval);
 		                }
 		            }
 		            //---for DEBUGGING---Serial.println("-------finish scanning with salt...");
