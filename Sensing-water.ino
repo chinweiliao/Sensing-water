@@ -60,7 +60,7 @@ int sensorPin = 0;
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 // ---------CHANGE HERE BASED ON WHAT YOU NEED---------------------
-char* fileName = "TEST.txt";
+String fileName = "";
 
 int holeDepth = 0;//unit: cm. for having log
 //int holeDepth = 4000;
@@ -200,6 +200,77 @@ void loop()
 	*/
 
     while(Serial.available()>0)
+ 	{
+ 		String temp = Serial.readStringUntil(',');
+ 		inputCommand = temp.toInt();
+
+	 	switch (inputCommand) {
+	 	    case 1:
+	 	    	// do something
+	 	    	temp = Serial.readStringUntil(','); 
+	         	holeDepth = temp.toInt()*100;
+	         
+	        	temp = Serial.readStringUntil(','); 
+	          	sensorInterval = temp.toInt();
+	         
+	          	temp = Serial.readStringUntil(','); 
+	          	noSalt = temp.toInt();
+	         
+	          	temp = Serial.readStringUntil(',');
+	          	sampleNumbers = temp.toInt();
+	          
+	          	temp = Serial.readStringUntil(',');
+	         	timeInterval = temp.toInt();
+
+	         	if(noSalt == 1)
+	         	{
+	         		scanSensors();
+                                //Serial.print("test_outside,");
+	         		inputCommand = 0;//cleaning input
+	            	stage = 1;
+	         	}
+	         	else if(noSalt == 0){
+		         	for(int i = 0; i<= sampleNumbers - 1; i++)
+		            {
+		                //to be changed
+		                //---for DEBUGGING---Serial.print("	");
+		                //---for DEBUGGING---Serial.print(i);
+		                //---for DEBUGGING---Serial.println("0 mins sensor scanning-------");
+		                scanSensors();
+		                if(i < sampleNumbers - 1)
+		                {
+		                	delay(timeInterval*60000);
+		                }
+		            }
+		            //---for DEBUGGING---Serial.println("-------finish scanning with salt...");
+		            //---for DEBUGGING---Serial.println(">>>entering y to start another round<<<");
+		            inputCommand = 0;
+		            stage = 1;
+	         	}
+	 	    	break;
+
+	 	    case 2:
+	 	      	Serial.print("ok,");
+	            digitalWrite(connectingLED, HIGH);
+	 	    	break;
+	 	    case 3:
+	 	    	Serial.print("close,");
+	        	digitalWrite(connectingLED, LOW);
+	        	stage = 0;//reset the ========start scanning======= 
+	 			break;
+	 		case 4: //TO BE CONFIRMED.. maybe can be used to adjust RTC time.
+	 			temp = Serial.readStringUntil(','); 
+	 			fileName = temp;
+	 			Serial.print(fileName);
+	 			break;
+	 	    default:
+	 	    	Serial.print("Invalid input,");
+	 	      // do something
+	 	}
+ 	}
+
+ 	/* -----old version without switch
+ 	while(Serial.available()>0)
     { 
         String temp = Serial.readStringUntil(',');  //myPort.write("1,70,25,0,2,10,");  sent from processing
         inputCommand = temp.toInt();
@@ -219,13 +290,6 @@ void loop()
           temp = Serial.readStringUntil(',');
           timeInterval = temp.toInt();
              
-  
-            
-        /*
-        Serial.print("I received: ");
-                //Serial.println(incomingByte);
-        Serial.println(inputCommand);
-        */
 
         if (inputCommand == 1 && noSalt == 1)
         { 
@@ -268,6 +332,12 @@ void loop()
         else if(inputCommand == 2)
         {
             Serial.print("ok,");
+            digitalWrite(connectingLED, HIGH);
+        }
+        else if(inputCommand == 3)
+        {
+        	Serial.print("close,");
+        	digitalWrite(connectingLED, LOW);
         }
         else 
         {
@@ -275,6 +345,8 @@ void loop()
         }
     }//-----END while
 
+    */
+    
 }
 
 void scanSensors()
@@ -283,12 +355,26 @@ void scanSensors()
 	int currentDepth = holeDepth; //resetting the depth
 
 	//for RTC
-	File dataFile = SD.open(fileName, FILE_WRITE);
 	DateTime now = rtc.now();
 
+	/*
+	fileName = String(now.year());
+	if(now.month()<10) fileName += "0";
+	fileName += String(now.month());
+	if(now.day()<10) fileName += "0";
+	fileName += String(now.day());
+	fileName += ".TXT";
+	*/
+
+        fileName = "123.TXT";
+
+	char fileNameCharArray[fileName.length()+1];
+	fileName.toCharArray(fileNameCharArray, fileName.length()+1);
+
+	File dataFile = SD.open(fileNameCharArray, FILE_WRITE);
+	
 	// make a string for assembling the data to log:
 	String timeStamp = "";
-
 
 	timeStamp += String(now.year());
 	timeStamp += "/";
@@ -318,8 +404,9 @@ void scanSensors()
 		//---for DEBUGGING---Serial.println("		finished stamping!");
 		}
 		else {
-		//---for DEBUGGING---Serial.println("error opening datalog.txt");
-	}
+		//Serial.print("error opening 1,");
+                }
+
 
 	String dataString = "";
 	String pcString = "";
@@ -401,8 +488,9 @@ void scanSensors()
 	//currentDepth -= sensorInterval; //last one so no need to subtract again
 
 	//---------------------------------------------------------------------------
+        //Serial.print("test2,");
+	Serial.print(pcString);
 
-	
 	//---for DEBUGGING---Serial.println("		writing sensor data... ");//--all at once
 	if (dataFile) 
 	{
@@ -412,12 +500,12 @@ void scanSensors()
                 //writeString(dataString);
                 //Serial.write(test);
 		//---for DEBUGGING---Serial.print("		");
-		Serial.println(pcString);
+		
 		//---for DEBUGGING---Serial.println("		finished writing!");
 	}
 	else 
 	{
-		Serial.println("error opening files");
+		Serial.println("error opening 2,");
 	}
 	//delay(1000);
 	//delay(7000);
