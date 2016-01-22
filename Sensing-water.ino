@@ -100,6 +100,9 @@ void setup()
     pinMode(s2, OUTPUT);
     pinMode(s3, OUTPUT);
 
+    pinMode(20, OUTPUT);
+    pinMode(21, OUTPUT);
+    
     pinMode(powerLED, OUTPUT);
     pinMode(connectingLED, OUTPUT);
     pinMode(readingLED, OUTPUT);
@@ -142,20 +145,20 @@ void setup()
 
 	//--------------for setting up RTC
 	if (! rtc.begin()) {
-		//---for DEBUGGING---Serial.println("Couldn't find RTC");
+		Serial.println("Couldn't find RTC");
 		while (1);
 	}
 
 	if (! rtc.isrunning()) {
-		//---for DEBUGGING---Serial.println("RTC is NOT running!");
+		Serial.println("RTC is NOT running!");
 		// following line sets the RTC to the date & time this sketch was compiled
 		rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 		// This line sets the RTC with an explicit date & time, for example to set
 		// January 21, 2014 at 3am you would call:
 		// rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
 	}
-	//----IMPORTANT-------SET TIME BY UNCOMMENTING THIS, UPLOAD, and then COMMENT IT and UPLOAD again.--------------
-	//rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); SET TIME BY UNCOMMENTING THIS, and then COMMENT IT and UPLOAD again.
+	//----IMPORTANT-------SET TIME BY UNCOMMENTING THIS, UPLOAD, and then COMMENT IT and UPLOAD again.-------------- SET TIME BY UNCOMMENTING THIS, and then COMMENT IT and UPLOAD again.
+	//rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 	//---------------
 
 	//estabilish contact. waiting for response.
@@ -251,11 +254,11 @@ void loop()
 	 	    	break;
 
 	 	    case 2:
-	 	      	Serial.print("ok,");
+	 	      	Serial.print("ok,end,");
 	            digitalWrite(connectingLED, HIGH);
 	 	    	break;
 	 	    case 3:
-	 	    	Serial.print("close,");
+	 	    	Serial.print("close,end,");
 	        	digitalWrite(connectingLED, LOW);
 	        	stage = 0;//reset the ========start scanning======= 
 	 			break;
@@ -265,7 +268,7 @@ void loop()
 	 			Serial.print(fileName);
 	 			break;
 	 	    default:
-	 	    	Serial.print("Invalid input,");
+	 	    	Serial.print("Invalid input,end,");
 	 	      // do something
 	 	}
  	}
@@ -367,7 +370,7 @@ void scanSensors()
 	fileName += ".TXT";
 	*/
 
-        fileName = "123.TXT";
+        fileName = "0122.TXT";
 
 	char fileNameCharArray[fileName.length()+1];
 	fileName.toCharArray(fileNameCharArray, fileName.length()+1);
@@ -490,6 +493,7 @@ void scanSensors()
 
 	//---------------------------------------------------------------------------
         //Serial.print("test2,");
+    pcString += "end,";
 	Serial.print(pcString);
 
 	//---for DEBUGGING---Serial.println("		writing sensor data... ");//--all at once
@@ -506,7 +510,7 @@ void scanSensors()
 	}
 	else 
 	{
-		Serial.println("error opening 2,");
+		Serial.println("error opening 2,end,");
 	}
 	//delay(1000);
 	//delay(7000);
