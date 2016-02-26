@@ -70,9 +70,10 @@ int timeInterval = 0; //unit: ms.
 int sampleNumbers = 0; //unit: times. 0,10,20,30,40,50,60,70,80,90mins  DONE
 
 //float dResistor = 2174.0;
-float dResistor = 261.0;
-float vDD = 5040.0; //9v
-//float vDD = 4550.0; //using computer
+//float dResistor = 261.0;cardboard prototype
+float dResistor = 237.4;
+//float vDD = 5040.0; //9v
+float vDD = 4990.0; //using computer
 
 int noSalt = 1;
 bool connectingStatus = false;
@@ -361,16 +362,16 @@ void scanSensors()
 	//for RTC
 	DateTime now = rtc.now();
 
-	/*
+	
 	fileName = String(now.year());
 	if(now.month()<10) fileName += "0";
 	fileName += String(now.month());
 	if(now.day()<10) fileName += "0";
 	fileName += String(now.day());
 	fileName += ".TXT";
-	*/
+	
 
-        fileName = "0122.TXT";
+       // fileName = "0122.TXT";
 
 	char fileNameCharArray[fileName.length()+1];
 	fileName.toCharArray(fileNameCharArray, fileName.length()+1);
