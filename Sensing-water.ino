@@ -225,8 +225,10 @@ void loop()
 	          
 	          	temp = Serial.readStringUntil(',');
 	         	//timeInterval = temp.toInt();
-                timeInterval = (int)(temp.toFloat()*60000);
-                        
+                timeInterval = (int)(temp.toFloat()*10);
+                //timeInterval = temp.toInt();
+                Serial.print(timeInterval);
+                        Serial.print("  ");
 	         	if(noSalt == 1)
 	         	{
 	         		scanSensors();
@@ -244,7 +246,8 @@ void loop()
 		                scanSensors();
 		                if(i < sampleNumbers - 1)
 		                {
-		                	delay(timeInterval);
+                      unsigned int x = timeInterval*6000;
+		                	delay(x);
 		                }
 		            }
 		            //---for DEBUGGING---Serial.println("-------finish scanning with salt...");
