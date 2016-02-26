@@ -96,6 +96,9 @@ unsigned long currentTime;
 bool interrupt = false;
 int samplingCounter = 0;
 
+unsigned long timeInterval_long = 0;
+
+
 void setup() 
 {
     pinMode(7, OUTPUT);
@@ -205,9 +208,19 @@ void loop()
           	temp = Serial.readStringUntil(',');
          	//timeInterval = temp.toInt();
             timeInterval = (int)(temp.toFloat()*10);
+            /*
+            Serial.print("tI: ");
+            Serial.print(timeInterval);
+            Serial.print(",");
+            */
+            timeInterval_long = (unsigned long)timeInterval*6000;
+            /*
+            Serial.print("tI_l: ");
+            Serial.print(timeInterval_long);
+            Serial.print(",");
+            */
             //timeInterval = temp.toInt();
-            //Serial.print(timeInterval);
-            //Serial.print("  ");
+
             if(noSalt == 1)inputCommand = 5; //after set up, no need to set up twice.
             else if(noSalt == 0) inputCommand = 6; //after set up, no need to set up twice.
             break;
@@ -255,12 +268,14 @@ void loop()
 		        }
 		    }
 		    */
+		    
+
 		    if(samplingCounter == 0){
 		        scanSensors(); //first scan 
 		    	previousTime = millis();
 		    	samplingCounter++;
 		    }
-		    else if(samplingCounter < sampleNumbers && millis()-previousTime >= timeInterval*6000){
+		    else if(samplingCounter < sampleNumbers && millis()-previousTime >= timeInterval_long){
 		    	previousTime = millis();
 		    	scanSensors();
 		    	samplingCounter++;
