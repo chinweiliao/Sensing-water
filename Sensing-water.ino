@@ -91,6 +91,11 @@ int stage = 0;
 bool prompt = false;
 //-------------------------------------
 
+unsigned long previousTime;
+unsigned long currentTime;
+bool interrupt = false;
+int samplingCounter = 0;
+
 void setup() 
 {
     pinMode(7, OUTPUT);
@@ -170,190 +175,121 @@ void setup()
 
 void loop() 
 {
-	/*
-    if(prompt == false)
-    {
-        //---for DEBUGGING---Serial.println("Enter y after setting up the line...");
-        //---for DEBUGGING---Serial.println(holeDepth);
-        prompt = true;
-    }
-	*/
-	
-	/*-----FOR ONE TIME TESTING.
-	while(!connectingStatus){
+    String temp = "";
 
-		if(Serial.available()>0)
-		{
-			String inString = Serial.readStringUntil(',');
-			if(inString == "x") {
-				Serial.print("ok");
-				connectingStatus = true;
-				digitalWrite(connectingLED, HIGH);
-				//TODO: how to make sure if the connection is broken during the process?????????
-			}
-			else
-			{
-				//Serial.print("didnt get x");
-			}
-		}
-		else
-		{
-			//Serial.print("no input");
-		}
-	}
-	*/
-
-    while(Serial.available()>0)
+    if(Serial.available()>0)
  	{
- 		String temp = Serial.readStringUntil(',');
+ 		temp = Serial.readStringUntil(',');
  		inputCommand = temp.toInt();
-
-	 	switch (inputCommand) {
-	 	    case 1:
-	 	    	// do something
-	 	    	temp = Serial.readStringUntil(','); 
-	         	holeDepth = temp.toInt()*100;
-	         
-	        	temp = Serial.readStringUntil(','); 
-	          	sensorInterval = temp.toInt();
-	         
-	          	temp = Serial.readStringUntil(','); 
-	          	noSalt = temp.toInt();
-	         
-	          	temp = Serial.readStringUntil(',');
-	          	sampleNumbers = temp.toInt();
-	          
-	          	temp = Serial.readStringUntil(',');
-	         	//timeInterval = temp.toInt();
-                timeInterval = (int)(temp.toFloat()*10);
-                //timeInterval = temp.toInt();
-                Serial.print(timeInterval);
-                        Serial.print("  ");
-	         	if(noSalt == 1)
-	         	{
-	         		scanSensors();
-                                //Serial.print("test_outside,");
-	         		inputCommand = 0;//cleaning input
-	            	stage = 1;
-	         	}
-	         	else if(noSalt == 0){
-		         	for(int i = 0; i<= sampleNumbers - 1; i++)
-		            {
-		                //to be changed
-		                //---for DEBUGGING---Serial.print("	");
-		                //---for DEBUGGING---Serial.print(i);
-		                //---for DEBUGGING---Serial.println("0 mins sensor scanning-------");
-		                scanSensors();
-		                if(i < sampleNumbers - 1)
-		                {
-                      unsigned int x = timeInterval*6000;
-		                	delay(x);
-		                }
-		            }
-		            //---for DEBUGGING---Serial.println("-------finish scanning with salt...");
-		            //---for DEBUGGING---Serial.println(">>>entering y to start another round<<<");
-		            inputCommand = 0;
-		            stage = 1;
-	         	}
-	 	    	break;
-
-	 	    case 2:
-	 	      	Serial.print("ok,end,");
-	            digitalWrite(connectingLED, HIGH);
-	 	    	break;
-	 	    case 3:
-	 	    	Serial.print("close,end,");
-	        	digitalWrite(connectingLED, LOW);
-	        	stage = 0;//reset the ========start scanning======= 
-	 			break;
-	 		case 4: //TO BE CONFIRMED.. maybe can be used to adjust RTC time.
-	 			temp = Serial.readStringUntil(','); 
-	 			fileName = temp;
-	 			Serial.print(fileName);
-	 			break;
-	 	    default:
-	 	    	Serial.print("Invalid input,end,");
-	 	      // do something
-	 	}
  	}
 
- 	/* -----old version without switch
- 	while(Serial.available()>0)
-    { 
-        String temp = Serial.readStringUntil(',');  //myPort.write("1,70,25,0,2,10,");  sent from processing
-        inputCommand = temp.toInt();
-        
-         temp = Serial.readStringUntil(','); 
-         holeDepth = temp.toInt()*100;
+ 	switch (inputCommand) 
+ 	{
+ 		case 0:
+ 			//all resetting code is here;
+ 			break;
+ 	    case 1:
+ 	    	// do something
+ 	    	temp = Serial.readStringUntil(','); 
+         	holeDepth = temp.toInt()*100;
          
-         temp = Serial.readStringUntil(','); 
-          sensorInterval = temp.toInt();
+        	temp = Serial.readStringUntil(','); 
+          	sensorInterval = temp.toInt();
          
-          temp = Serial.readStringUntil(','); 
-          noSalt = temp.toInt();
+          	temp = Serial.readStringUntil(','); 
+          	noSalt = temp.toInt();
          
-          temp = Serial.readStringUntil(',');
-          sampleNumbers = temp.toInt();
+          	temp = Serial.readStringUntil(',');
+          	sampleNumbers = temp.toInt();
           
-          temp = Serial.readStringUntil(',');
-          timeInterval = temp.toInt();
-             
+          	temp = Serial.readStringUntil(',');
+         	//timeInterval = temp.toInt();
+            timeInterval = (int)(temp.toFloat()*10);
+            //timeInterval = temp.toInt();
+            //Serial.print(timeInterval);
+            //Serial.print("  ");
+            if(noSalt == 1)inputCommand = 5; //after set up, no need to set up twice.
+            else if(noSalt == 0) inputCommand = 6; //after set up, no need to set up twice.
+            break;
 
-        if (inputCommand == 1 && noSalt == 1)
-        { 
-
-            //---for DEBUGGING---Serial.println("	initial scanning without salt...");
-            scanSensors();	
-        //>>setting up sd card
-        //>>write time stamp
-        //>>scan
-        //>>write value(initial without salt)
-        //>>wait for another input
-            inputCommand = 0;//cleaning input
-            //TODO more to reset???????!!!!
-            stage = 1;//done initial    
-            //---for DEBUGGING---Serial.println();
-            //---for DEBUGGING---Serial.println("Type another y and press ENTER after adding salt...");
-
-        }
-        else if(inputCommand == 1 && noSalt == 0)
-        {
-            //---for DEBUGGING---Serial.println("	start scanning with salt...");
-            for(int i = 0; i<= sampleNumbers - 1; i++)
-            {
-                //to be changed
-                //---for DEBUGGING---Serial.print("	");
-                //---for DEBUGGING---Serial.print(i);
-                //---for DEBUGGING---Serial.println("0 mins sensor scanning-------");
-                scanSensors();
-                if(i < sampleNumbers - 1)
-                {
-                	delay(timeInterval*60000);
-                }
-            }
-            //---for DEBUGGING---Serial.println("-------finish scanning with salt...");
-            //---for DEBUGGING---Serial.println(">>>entering y to start another round<<<");
-            inputCommand = 0;
-            stage = 1;
-
-        }
-        else if(inputCommand == 2)
-        {
-            Serial.print("ok,");
+ 	    case 2:
+ 	      	Serial.print("ok,end,");
             digitalWrite(connectingLED, HIGH);
-        }
-        else if(inputCommand == 3)
-        {
-        	Serial.print("close,");
+            inputCommand = 0;
+ 	    	break;
+ 	    case 3:
+ 	    	Serial.print("close,end,");
         	digitalWrite(connectingLED, LOW);
-        }
-        else 
-        {
-            //---for DEBUGGING---Serial.println("invalid input");
-        }
-    }//-----END while
+        	inputCommand = 0;
+        	stage = 0;//reset the ========start scanning======= 
+ 			break;
+ 		case 4: 
+ 			Serial.print("stop,end,");
+ 			interrupt = true;//???
+ 			//RESET inputcommand = 0;
+ 			inputCommand = 0; //resetting
+ 			samplingCounter = 0; //TODO more????????????
+ 			break;
+ 		case 5: //noSalt == 1   //independent scan!!
+ 			//DO stuff here?
+			scanSensors();
+			inputCommand = 0;//resetting
+			stage = 1;
+			break;
 
-    */
+		case 6: //noSalt == 0  //continuous scan
+			/*
+		 	for(int i = 0; i<= sampleNumbers - 1; i++)
+		    {
+		        //to be changed
+		        //---for DEBUGGING---Serial.print("	");
+		        //---for DEBUGGING---Serial.print(i);
+		        //---for DEBUGGING---Serial.println("0 mins sensor scanning-------");
+		        scanSensors();
+		        if(i < sampleNumbers - 1)
+		        {
+		      unsigned int x = timeInterval*6000;  //can' use unsigned long/ long/ int (will overflow?
+		      Serial.print(x);
+		      Serial.print("  "); 
+		        	delay(x);
+		        }
+		    }
+		    */
+		    if(samplingCounter == 0){
+		        scanSensors(); //first scan 
+		    	previousTime = millis();
+		    	samplingCounter++;
+		    }
+		    else if(samplingCounter < sampleNumbers && millis()-previousTime >= timeInterval*6000){
+		    	previousTime = millis();
+		    	scanSensors();
+		    	samplingCounter++;
+			}
+			else if(samplingCounter == sampleNumbers){
+				Serial.print("completed,end,");
+				samplingCounter = 0; //resetting
+				inputCommand = 0; //resetting
+			}
+			//else{
+				//Serial.print("exception caught");
+			//}
+ 			break;
+
+ 	    default:
+ 	    	Serial.print("Invalid input or not initialized,end,");
+        	inputCommand = 0;
+ 	      // do something
+	}
+
+	
+ 		//start using millis????	
+
+        //---for DEBUGGING---Serial.println("-------finish scanning with salt...");
+        //---for DEBUGGING---Serial.println(">>>entering y to start another round<<<");		         
+	//
+    	//inputCommand = 0;
+        //stage = 1;
+
     
 }
 
