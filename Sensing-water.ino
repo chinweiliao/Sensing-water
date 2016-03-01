@@ -223,6 +223,7 @@ void loop()
 
             if(noSalt == 1)inputCommand = 5; //after set up, no need to set up twice.
             else if(noSalt == 0) inputCommand = 6; //after set up, no need to set up twice.
+            else if(noSalt == 2) inputCommand = 7;  //starting after sometime, not starting in the beginning.
             break;
 
  	    case 2:
@@ -281,7 +282,7 @@ void loop()
 		    	samplingCounter++;
 			}
 			else if(samplingCounter == sampleNumbers){
-				Serial.print("completed,end,");
+				//Serial.print("completed,end,");//FOR DEBUGGING
 				samplingCounter = 0; //resetting
 				inputCommand = 0; //resetting
 			}
@@ -290,7 +291,27 @@ void loop()
 			//}
 			stage = 1;
  			break;
-
+ 		case 7: //noSalt == 2
+ 			if(samplingCounter == 0){
+		        //scanSensors(); //first scan 
+		    	previousTime = millis();
+		    	samplingCounter++;
+		    }
+		    else if(samplingCounter < sampleNumbers+1 && millis()-previousTime >= timeInterval_long){
+		    	previousTime = millis();
+		    	scanSensors();
+		    	samplingCounter++;
+			}
+			else if(samplingCounter == sampleNumbers+1){
+				//Serial.print("completed,end,");//FOR DEBUGGING
+				samplingCounter = 0; //resetting
+				inputCommand = 0; //resetting
+			}
+			//else{
+				//Serial.print("exception caught");
+			//}
+			stage = 1;
+ 			break;
  	    default:
  	    	Serial.print("Invalid input or not initialized,end,");
         	inputCommand = 0;
@@ -400,12 +421,15 @@ void scanSensors()
 			//-------------
 
 			//make sure it is OK??????
-			digitalWrite(powerLED, LOW);
+			//if(count%3 == 0)
+			if(count <= 3)digitalWrite(powerLED, LOW);
+			if(count >7 && count <= 11)digitalWrite(powerLED, LOW);
 			delay(50);
 			// TODO add different time
 
 			sensorValue = analogRead(sensorPin);
-			digitalWrite(powerLED, HIGH);
+			if(count > 3 && count <=7)digitalWrite(powerLED, HIGH);
+			if(count > 11) digitalWrite(powerLED, HIGH);
 			//---for DEBUGGING---Serial.print("Sensor No.");
 			//---for DEBUGGING---Serial.println(sensorCount);
 			sensorCount++;
