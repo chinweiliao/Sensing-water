@@ -288,6 +288,7 @@ void loop()
 			//else{
 				//Serial.print("exception caught");
 			//}
+			stage = 1;
  			break;
 
  	    default:
@@ -399,11 +400,12 @@ void scanSensors()
 			//-------------
 
 			//make sure it is OK??????
+			digitalWrite(powerLED, LOW);
 			delay(50);
 			// TODO add different time
 
 			sensorValue = analogRead(sensorPin);
-
+			digitalWrite(powerLED, HIGH);
 			//---for DEBUGGING---Serial.print("Sensor No.");
 			//---for DEBUGGING---Serial.println(sensorCount);
 			sensorCount++;
