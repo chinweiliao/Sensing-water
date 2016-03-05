@@ -277,7 +277,7 @@ void loop()
 		    	samplingCounter++;
 		    }
 		    else if(samplingCounter < sampleNumbers && millis()-previousTime >= timeInterval_long){
-		    	previousTime = millis();
+		  		previousTime = millis();
 		    	scanSensors();
 		    	samplingCounter++;
 			}
