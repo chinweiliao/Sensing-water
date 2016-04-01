@@ -71,7 +71,7 @@ int sampleNumbers = 0; //unit: times. 0,10,20,30,40,50,60,70,80,90mins  DONE
 
 //float dResistor = 2174.0;
 //float dResistor = 261.0;cardboard prototype
-float dResistor = 237.4;
+float dResistor = 238.8;
 //float vDD = 5040.0; //9v
 float vDD = 4990.0; //using computer
 
